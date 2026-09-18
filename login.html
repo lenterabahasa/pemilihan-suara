@@ -4,26 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — E-PRESIDEN</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Autentikasi Aman</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link">Beranda</a></li>
-        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link">Beranda</a></li>
+        <li><a href="hasil.html" class="nav-link">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer">
-        <a href="/" class="btn btn-secondary btn-sm">Kembali</a>
+        <a href="index.html" class="btn btn-secondary btn-sm">Kembali</a>
       </div>
     </div>
   </header>
@@ -32,7 +32,7 @@
   <main class="container" style="padding-top: 3rem; padding-bottom: 4rem; max-width: 500px;">
     <div class="card" style="padding: 2.25rem;">
       <div style="text-align: center; margin-bottom: 2rem;">
-        <img src="/img/logo.svg" alt="Logo" style="width: 52px; height: 52px; margin-bottom: 0.75rem;">
+        <img src="img/logo.svg" alt="Logo" style="width: 52px; height: 52px; margin-bottom: 0.75rem;">
         <h2 style="font-size: 1.5rem;">Masuk ke Akun Anda</h2>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">
           Gunakan ID Pemilih atau kredensial petugas yang telah terdaftar.
@@ -89,7 +89,8 @@
     </div>
   </main>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     function setDemo(voterId, pwd) {
       document.getElementById('voterId').value = voterId;
@@ -123,13 +124,13 @@
 
         setTimeout(() => {
           if (res.user.role === 'admin') {
-            window.location.href = '/admin.html';
+            window.location.href = 'admin.html';
           } else if (res.user.role === 'auditor') {
-            window.location.href = '/auditor.html';
+            window.location.href = 'auditor.html';
           } else {
-            window.location.href = '/bilik-suara.html';
+            window.location.href = 'bilik-suara.html';
           }
-        }, 600);
+        }, 500);
 
       } catch (err) {
         showAlert('loginAlertContainer', err.message, 'danger');
@@ -138,12 +139,11 @@
       }
     });
 
-    // Cek jika pengguna sudah login sebelumnya
     getCurrentUser().then(user => {
       if (user) {
-        if (user.role === 'admin') window.location.href = '/admin.html';
-        else if (user.role === 'auditor') window.location.href = '/auditor.html';
-        else window.location.href = '/bilik-suara.html';
+        if (user.role === 'admin') window.location.href = 'admin.html';
+        else if (user.role === 'auditor') window.location.href = 'auditor.html';
+        else window.location.href = 'bilik-suara.html';
       }
     });
   </script>

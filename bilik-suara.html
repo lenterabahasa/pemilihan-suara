@@ -4,24 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bilik Suara Digital — E-PRESIDEN</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Bilik Suara Elektronik</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link">Beranda</a></li>
-        <li><a href="/bilik-suara.html" class="nav-link active">Bilik Suara</a></li>
-        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link">Beranda</a></li>
+        <li><a href="bilik-suara.html" class="nav-link active">Bilik Suara</a></li>
+        <li><a href="hasil.html" class="nav-link">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer"></div>
     </div>
@@ -55,7 +55,7 @@
         </div>
 
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="/hasil.html" class="btn btn-primary">
+          <a href="hasil.html" class="btn btn-primary">
             📊 Lihat Hasil &amp; Statistik
           </a>
           <button onclick="handleLogout()" class="btn btn-secondary">
@@ -147,11 +147,12 @@
   <!-- Footer -->
   <footer>
     <div class="container" style="text-align: center; font-size: 0.85rem;">
-      E-PRESIDEN &copy; 2026 — Kerahasiaan Suara Dijamin oleh Kriptografi &amp; Transaksi Atomik Database.
+      E-PRESIDEN &copy; 2026 — Kerahasiaan Suara Dijamin oleh Kriptografi &amp; Transaksi Satu Pemilih Satu Suara.
     </div>
   </footer>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     let currentUser = null;
     let candidatesList = [];
@@ -160,25 +161,22 @@
     async function initBooth() {
       currentUser = await getCurrentUser();
       if (!currentUser) {
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
         return;
       }
 
       updateNavAuthUI(currentUser);
 
-      // Cek peran: Admin/Auditor tidak memberikan suara
       if (currentUser.role !== 'voter') {
         showAlert('boothAlertContainer', `Peran Anda adalah '${currentUser.role}'. Hanya akun Pemilih yang dapat memberikan suara.`, 'info');
         return;
       }
 
-      // Cek status apakah sudah memilih
       if (currentUser.has_voted === 1) {
         showAlreadyVotedState();
         return;
       }
 
-      // Ambil daftar kandidat
       try {
         const candRes = await apiFetch('/api/vote/candidates');
         candidatesList = candRes.candidates || [];

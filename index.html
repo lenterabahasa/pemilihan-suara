@@ -4,28 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-PRESIDEN — Simulasi Pemilihan Presiden Berintegritas</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Sistem Pemilu Digital Anti-Kecurangan</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link active">Beranda</a></li>
-        <li><a href="/bilik-suara.html" class="nav-link">Bilik Suara</a></li>
-        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link active">Beranda</a></li>
+        <li><a href="bilik-suara.html" class="nav-link">Bilik Suara</a></li>
+        <li><a href="hasil.html" class="nav-link">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer">
-        <!-- Terisi dinamis oleh api.js -->
-        <a href="/login.html" class="btn btn-primary btn-sm">Masuk / Login</a>
+        <a href="login.html" class="btn btn-primary btn-sm">Masuk / Login</a>
       </div>
     </div>
   </header>
@@ -63,10 +62,10 @@
       </div>
 
       <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <a href="/bilik-suara.html" class="btn btn-success btn-lg" id="ctaBooth">
+        <a href="bilik-suara.html" class="btn btn-success btn-lg" id="ctaBooth">
           🗳️ Masuk ke Bilik Suara
         </a>
-        <a href="/hasil.html" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+        <a href="hasil.html" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
           📊 Pantau Hasil &amp; Statistik
         </a>
       </div>
@@ -112,7 +111,7 @@
           <div style="font-size: 2rem; margin-bottom: 0.75rem;">⚡</div>
           <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Transaksi Atomik Suara Tunggal</h3>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
-            Backend memverifikasi status pemilih dengan transaksi basis data atomik (ACID). Upaya memilih dua kali akan langsung digagalkan dan ditandai.
+            Sistem memverifikasi status pemilih secara atomik. Upaya memilih dua kali akan langsung digagalkan dan dicatat ke sistem anti-fraud.
           </p>
         </div>
 
@@ -128,7 +127,7 @@
           <div style="font-size: 2rem; margin-bottom: 0.75rem;">📜</div>
           <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Audit Log Kriptografis</h3>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
-            Setiap catatan audit log menggunakan rantai hash SHA-256 (Hash Chained). Setiap modifikasi ilegal akan langsung terdeteksi oleh Auditor.
+            Setiap catatan audit log menggunakan rantai hash SHA-256 (Hash Chaining). Setiap modifikasi data ilegal akan langsung terdeteksi oleh Auditor.
           </p>
         </div>
       </div>
@@ -172,7 +171,7 @@
         <div style="max-width: 480px;">
           <h4 style="color: #ffffff; margin-bottom: 0.75rem;">E-PRESIDEN</h4>
           <p style="font-size: 0.85rem; line-height: 1.6;">
-            Sistem simulasi pemungutan suara elektronik dengan fokus pada integritas data, transparansi, kerahasiaan suara, dan deteksi kecurangan.
+            Sistem simulasi pemungutan suara elektronik murni client-side dengan fokus pada integritas data, transparansi, kerahasiaan suara, dan deteksi kecurangan.
           </p>
           <p style="font-size: 0.8rem; color: #64748b; margin-top: 1rem;">
             <em>Peringatan: Produk ini ditujukan sebagai sistem simulasi/prototipe dan bukan sistem resmi untuk menyelenggarakan pemilu nasional tanpa sertifikasi, audit independen, dan persetujuan regulator terkait.</em>
@@ -181,21 +180,23 @@
         <div>
           <h5 style="color: #ffffff; margin-bottom: 0.75rem;">Navigasi Sistem</h5>
           <ul style="list-style: none; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px;">
-            <li><a href="/login.html">Login Pemilih &amp; Petugas</a></li>
-            <li><a href="/bilik-suara.html">Bilik Suara Digital</a></li>
-            <li><a href="/hasil.html">Rekapitulasi Hasil</a></li>
-            <li><a href="/admin.html">Dashboard Administrator</a></li>
-            <li><a href="/auditor.html">Portal Auditor Independen</a></li>
+            <li><a href="login.html">Login Pemilih &amp; Petugas</a></li>
+            <li><a href="bilik-suara.html">Bilik Suara Digital</a></li>
+            <li><a href="hasil.html">Rekapitulasi Hasil</a></li>
+            <li><a href="admin.html">Dashboard Administrator</a></li>
+            <li><a href="auditor.html">Portal Auditor Independen</a></li>
+            <li style="margin-top: 8px;"><button onclick="resetSimulation()" class="btn btn-secondary btn-sm" style="background:#334155; color:#fff; font-size:0.75rem;">🔄 Reset Data Simulasi</button></li>
           </ul>
         </div>
       </div>
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center; font-size: 0.8rem;">
-        &copy; 2026 E-PRESIDEN — Platform Simulasi Pemilu Berintegritas.
+        &copy; 2026 E-PRESIDEN — Platform Simulasi Pemilu Berintegritas (Pure Frontend).
       </div>
     </div>
   </footer>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     let currentCandidates = [];
 
@@ -204,7 +205,6 @@
       updateNavAuthUI(user);
 
       try {
-        // Ambil status pemilihan dan partisipasi
         const statusRes = await apiFetch('/api/vote/status');
         const election = statusRes.election;
 
@@ -225,7 +225,6 @@
           badge.className = 'badge badge-info';
         }
 
-        // Ambil statistik partisipasi dari hasil publik
         const resultsRes = await apiFetch('/api/vote/results');
         if (resultsRes.participation) {
           document.getElementById('statTotalVoters').textContent = resultsRes.participation.totalVoters;
@@ -237,7 +236,6 @@
           document.getElementById('statTurnout').textContent = resultsRes.turnoutPercentage + '%';
         }
 
-        // Ambil data kandidat
         const candRes = await apiFetch('/api/vote/candidates');
         currentCandidates = candRes.candidates || [];
         renderCandidates(currentCandidates);
@@ -267,7 +265,7 @@
               <button onclick="openCandidateModal(${c.id})" class="btn btn-secondary btn-sm" style="width: 100%;">
                 📋 Lihat Visi, Misi &amp; Program
               </button>
-              <a href="/bilik-suara.html" class="btn btn-primary btn-sm" style="width: 100%;">
+              <a href="bilik-suara.html" class="btn btn-primary btn-sm" style="width: 100%;">
                 🗳️ Pilih di Bilik Suara
               </a>
             </div>
@@ -293,7 +291,6 @@
       document.getElementById('candidateModal').classList.remove('active');
     }
 
-    // Tutup modal jika klik overlay
     document.getElementById('candidateModal').addEventListener('click', (e) => {
       if (e.target.id === 'candidateModal') closeCandidateModal();
     });

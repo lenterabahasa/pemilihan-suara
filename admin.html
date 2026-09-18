@@ -4,24 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Administrator — E-PRESIDEN</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Pusat Kendali &amp; Pengawasan Pemilu</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link">Beranda</a></li>
-        <li><a href="/admin.html" class="nav-link active">Admin Dashboard</a></li>
-        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link">Beranda</a></li>
+        <li><a href="admin.html" class="nav-link active">Admin Dashboard</a></li>
+        <li><a href="hasil.html" class="nav-link">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer"></div>
     </div>
@@ -96,7 +96,7 @@
           <div>
             <h3 style="font-size: 1.2rem;">Pusat Pemantauan Kejadian Fraud (Anti-Fraud Center)</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
-              Sistem mendeteksi percobaan login berulang, duplicate vote, dan request anomali dengan kategori risiko.
+              Sistem mendeteksi percobaan login berulang, duplicate vote, dan anomali dengan kategori risiko.
             </p>
           </div>
           <button onclick="loadFraudEvents()" class="btn btn-secondary btn-sm">🔄 Muat Ulang</button>
@@ -305,7 +305,8 @@
     </div>
   </div>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     let currentAdmin = null;
 
@@ -329,7 +330,7 @@
     async function initAdmin() {
       currentAdmin = await getCurrentUser();
       if (!currentAdmin || currentAdmin.role !== 'admin') {
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
         return;
       }
       updateNavAuthUI(currentAdmin);
@@ -574,7 +575,6 @@
         document.getElementById('setElectionName').value = el.name;
         document.getElementById('setElectionStatus').value = el.status;
 
-        // Ambil snapshots
         const snapRes = await apiFetch('/api/audit/snapshots');
         const snapContainer = document.getElementById('snapshotListContainer');
         if (!snapRes.snapshots || snapRes.snapshots.length === 0) {
@@ -614,7 +614,7 @@
       if (!confirm('Apakah Anda yakin ingin membuat snapshot integritas hasil pemilihan saat ini?')) return;
       try {
         const res = await apiFetch('/api/admin/election/snapshot', { method: 'POST' });
-        alert('Snapshot berhasil dibuat dengan SHA-256 Hash:\n' + res.snapshot.integrityHash);
+        alert('Snapshot berhasil dibuat dengan SHA-256 Hash:\n' + res.snapshot.integrity_hash);
         loadMonitoring();
       } catch (err) {
         alert('Gagal membuat snapshot: ' + err.message);

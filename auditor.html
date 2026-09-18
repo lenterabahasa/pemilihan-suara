@@ -4,24 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Auditor Independen — E-PRESIDEN</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Portal Pengawas &amp; Auditor Independen</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link">Beranda</a></li>
-        <li><a href="/auditor.html" class="nav-link active">Portal Auditor</a></li>
-        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link">Beranda</a></li>
+        <li><a href="auditor.html" class="nav-link active">Portal Auditor</a></li>
+        <li><a href="hasil.html" class="nav-link">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer"></div>
     </div>
@@ -51,7 +51,7 @@
         <div>
           <h3 style="font-size: 1.2rem;">🛡️ Alat Verifikasi Integritas Kriptografis (Hash Chaining)</h3>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
-            Menjalankan verifikasi matematis atas setiap blok audit log. Jika ada baris yang disisipkan, diedit, atau dihapus langsung di database, verifikasi akan gagal secara otomatis.
+            Menjalankan verifikasi matematis atas setiap blok audit log. Jika ada baris yang disisipkan, diedit, atau dimanipulasi, verifikasi akan gagal secara otomatis.
           </p>
         </div>
         <button onclick="runAuditVerification()" id="btnVerify" class="btn btn-primary">
@@ -141,7 +141,8 @@
 
   </main>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     let currentAuditor = null;
 
@@ -163,7 +164,7 @@
     async function initAuditor() {
       currentAuditor = await getCurrentUser();
       if (!currentAuditor || (currentAuditor.role !== 'auditor' && currentAuditor.role !== 'admin')) {
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
         return;
       }
       updateNavAuthUI(currentAuditor);

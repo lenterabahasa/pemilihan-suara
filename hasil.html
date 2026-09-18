@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rekapitulasi Hasil Pemilihan — E-PRESIDEN</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -12,17 +12,17 @@
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="/" class="brand">
-        <img src="/img/logo.svg" alt="Logo E-Presiden">
+      <a href="index.html" class="brand">
+        <img src="img/logo.svg" alt="Logo E-Presiden">
         <div class="brand-text">
           <span class="brand-title">E-PRESIDEN</span>
           <span class="brand-subtitle">Transparansi Hasil &amp; Rekapitulasi</span>
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/" class="nav-link">Beranda</a></li>
-        <li><a href="/bilik-suara.html" class="nav-link">Bilik Suara</a></li>
-        <li><a href="/hasil.html" class="nav-link active">Hasil Pemilihan</a></li>
+        <li><a href="index.html" class="nav-link">Beranda</a></li>
+        <li><a href="bilik-suara.html" class="nav-link">Bilik Suara</a></li>
+        <li><a href="hasil.html" class="nav-link active">Hasil Pemilihan</a></li>
       </ul>
       <div id="navAuthContainer"></div>
     </div>
@@ -145,11 +145,12 @@
   <!-- Footer -->
   <footer>
     <div class="container" style="text-align: center; font-size: 0.85rem;">
-      E-PRESIDEN &copy; 2026 — Transparansi Penuh, Satu Pemilih Satu Suara, Kerahasiaan Terjamin.
+      E-PRESIDEN &copy; 2026 — Transparansi Penuh, Satu Pemilih Satu Suara, Kerahasiaan Terjamin (Pure Frontend).
     </div>
   </footer>
 
-  <script src="/js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
   <script>
     let myChart = null;
 
@@ -179,7 +180,6 @@
         }
 
         if (!data.published && !data.isPrivileged) {
-          // Tampilkan pesan unreleased
           document.getElementById('unreleasedContainer').style.display = 'block';
           document.getElementById('releasedResultsContainer').style.display = 'none';
 
@@ -191,7 +191,6 @@
           return;
         }
 
-        // Tampilkan hasil rincian
         document.getElementById('unreleasedContainer').style.display = 'none';
         document.getElementById('releasedResultsContainer').style.display = 'block';
 
