@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#logoGrad)"/>
+  <!-- Kotak Suara / Bilik Suara -->
+  <path d="M12 18h24v18a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V18z" fill="#f8fafc" opacity="0.95"/>
+  <rect x="18" y="14" width="12" height="4" rx="1" fill="#fbbf24"/>
+  <rect x="20" y="24" width="8" height="2" rx="1" fill="#0f172a"/>
+  <!-- Centang Integritas -->
+  <circle cx="34" cy="34" r="7" fill="#10b981"/>
+  <path d="M31 34l2 2 4-4" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

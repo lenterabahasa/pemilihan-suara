@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-PRESIDEN — Simulasi Pemilihan Presiden Berintegritas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="/img/logo.svg" alt="Logo E-Presiden">
+        <div class="brand-text">
+          <span class="brand-title">E-PRESIDEN</span>
+          <span class="brand-subtitle">Sistem Pemilu Digital Anti-Kecurangan</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link active">Beranda</a></li>
+        <li><a href="/bilik-suara.html" class="nav-link">Bilik Suara</a></li>
+        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+      </ul>
+      <div id="navAuthContainer">
+        <!-- Terisi dinamis oleh api.js -->
+        <a href="/login.html" class="btn btn-primary btn-sm">Masuk / Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+        <span class="badge badge-warning" id="electionStatusBadge">Memuat Status...</span>
+        <span style="font-size: 0.85rem; color: #cbd5e1;" id="electionTimeRange"></span>
+      </div>
+      <h1 id="electionName">Pemilihan Presiden &amp; Wakil Presiden RI 2026</h1>
+      <p>
+        Platform simulasi pemungutan suara elektronik dengan arsitektur pencegahan kecurangan berlapis, transaksi atomik, kerahasiaan suara mutlak, serta jejak audit kriptografis.
+      </p>
+
+      <!-- Stat Box Grid -->
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalVoters">-</div>
+          <div class="stat-label">Pemilih Terdaftar</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalVoted">-</div>
+          <div class="stat-label">Suara Masuk</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTurnout">-</div>
+          <div class="stat-label">Tingkat Partisipasi</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" style="color: #34d399;" id="statSecurityPill">100%</div>
+          <div class="stat-label">Integritas Transaksi</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="/bilik-suara.html" class="btn btn-success btn-lg" id="ctaBooth">
+          🗳️ Masuk ke Bilik Suara
+        </a>
+        <a href="/hasil.html" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+          📊 Pantau Hasil &amp; Statistik
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Daftar Kandidat Preview -->
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 3.5rem;">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+      <span class="badge badge-info" style="margin-bottom: 8px;">Peserta Pemilu</span>
+      <h2>Pasangan Calon Presiden &amp; Wakil Presiden</h2>
+      <p style="color: var(--text-muted);">
+        Setiap pasangan calon memiliki hak perlakuan yang setara dalam penyajian informasi visi, misi, dan program kerja.
+      </p>
+    </div>
+
+    <div class="candidate-grid" id="candidateListContainer">
+      <div style="text-align: center; grid-column: 1 / -1; padding: 2rem;">
+        <p>Memuat data kandidat...</p>
+      </div>
+    </div>
+
+    <!-- 4 Pilar Anti-Kecurangan -->
+    <div style="margin-top: 5rem;">
+      <div style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+        <span class="badge badge-normal" style="margin-bottom: 8px;">Keamanan &amp; Transparansi</span>
+        <h2>Sistem Pencegahan Kecurangan Berlapis</h2>
+        <p style="color: var(--text-muted);">
+          Dirancang untuk menjamin prinsip <em>"Satu pemilih, satu suara, suara rahasia, hasil dapat diaudit."</em>
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">🔒</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Kerahasiaan Suara Mutlak</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+            Data pilihan kandidat dipisahkan dari identitas pemilih di database. Tidak ada relasi <code>user_id</code> pada tabel suara, sehingga pilihan Anda anonim.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">⚡</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Transaksi Atomik Suara Tunggal</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+            Backend memverifikasi status pemilih dengan transaksi basis data atomik (ACID). Upaya memilih dua kali akan langsung digagalkan dan ditandai.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">🛡️</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Deteksi Anomali Real-Time</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+            Mesin Anti-Fraud memantau serangan brute force, percobaan akses terlarang, serta lonjakan request mencurigakan dengan klasifikasi risiko multi-tier.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">📜</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Audit Log Kriptografis</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+            Setiap catatan audit log menggunakan rantai hash SHA-256 (Hash Chained). Setiap modifikasi ilegal akan langsung terdeteksi oleh Auditor.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Detail Visi Misi Kandidat -->
+  <div class="modal-overlay" id="candidateModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <div>
+          <span class="badge badge-warning" id="modalCandNum">Nomor 01</span>
+          <h2 id="modalCandName" style="font-size: 1.35rem; margin-top: 6px;">Nama Kandidat</h2>
+        </div>
+        <button onclick="closeCandidateModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Visi:</h4>
+        <p id="modalCandVision" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.5;"></p>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Misi:</h4>
+        <p id="modalCandMission" style="font-size: 0.92rem; color: var(--text-main); white-space: pre-line; line-height: 1.5;"></p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Program Unggulan:</h4>
+        <p id="modalCandPrograms" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.5;"></p>
+      </div>
+
+      <button onclick="closeCandidateModal()" class="btn btn-secondary" style="width: 100%;">Tutup Rincian</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem;">
+        <div style="max-width: 480px;">
+          <h4 style="color: #ffffff; margin-bottom: 0.75rem;">E-PRESIDEN</h4>
+          <p style="font-size: 0.85rem; line-height: 1.6;">
+            Sistem simulasi pemungutan suara elektronik dengan fokus pada integritas data, transparansi, kerahasiaan suara, dan deteksi kecurangan.
+          </p>
+          <p style="font-size: 0.8rem; color: #64748b; margin-top: 1rem;">
+            <em>Peringatan: Produk ini ditujukan sebagai sistem simulasi/prototipe dan bukan sistem resmi untuk menyelenggarakan pemilu nasional tanpa sertifikasi, audit independen, dan persetujuan regulator terkait.</em>
+          </p>
+        </div>
+        <div>
+          <h5 style="color: #ffffff; margin-bottom: 0.75rem;">Navigasi Sistem</h5>
+          <ul style="list-style: none; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px;">
+            <li><a href="/login.html">Login Pemilih &amp; Petugas</a></li>
+            <li><a href="/bilik-suara.html">Bilik Suara Digital</a></li>
+            <li><a href="/hasil.html">Rekapitulasi Hasil</a></li>
+            <li><a href="/admin.html">Dashboard Administrator</a></li>
+            <li><a href="/auditor.html">Portal Auditor Independen</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: center; font-size: 0.8rem;">
+        &copy; 2026 E-PRESIDEN — Platform Simulasi Pemilu Berintegritas.
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentCandidates = [];
+
+    async function initPage() {
+      const user = await getCurrentUser();
+      updateNavAuthUI(user);
+
+      try {
+        // Ambil status pemilihan dan partisipasi
+        const statusRes = await apiFetch('/api/vote/status');
+        const election = statusRes.election;
+
+        document.getElementById('electionName').textContent = election.name;
+        
+        const badge = document.getElementById('electionStatusBadge');
+        if (election.status === 'ongoing') {
+          badge.textContent = '🟢 Sedang Berlangsung';
+          badge.className = 'badge badge-success';
+        } else if (election.status === 'draft') {
+          badge.textContent = '⚪ Draf Pemilihan';
+          badge.className = 'badge badge-neutral';
+        } else if (election.status === 'closed') {
+          badge.textContent = '🟡 Pemilihan Ditutup';
+          badge.className = 'badge badge-warning';
+        } else if (election.status === 'published') {
+          badge.textContent = '🔵 Hasil Dipublikasikan';
+          badge.className = 'badge badge-info';
+        }
+
+        // Ambil statistik partisipasi dari hasil publik
+        const resultsRes = await apiFetch('/api/vote/results');
+        if (resultsRes.participation) {
+          document.getElementById('statTotalVoters').textContent = resultsRes.participation.totalVoters;
+          document.getElementById('statTotalVoted').textContent = resultsRes.participation.totalVoted;
+          document.getElementById('statTurnout').textContent = resultsRes.participation.turnoutPercentage + '%';
+        } else if (resultsRes.totalVoters !== undefined) {
+          document.getElementById('statTotalVoters').textContent = resultsRes.totalVoters;
+          document.getElementById('statTotalVoted').textContent = resultsRes.totalVoted;
+          document.getElementById('statTurnout').textContent = resultsRes.turnoutPercentage + '%';
+        }
+
+        // Ambil data kandidat
+        const candRes = await apiFetch('/api/vote/candidates');
+        currentCandidates = candRes.candidates || [];
+        renderCandidates(currentCandidates);
+
+      } catch (err) {
+        console.error('Error memuat data:', err);
+      }
+    }
+
+    function renderCandidates(candidates) {
+      const container = document.getElementById('candidateListContainer');
+      if (!candidates || candidates.length === 0) {
+        container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Belum ada kandidat terdaftar.</p>';
+        return;
+      }
+
+      container.innerHTML = candidates.map(c => `
+        <div class="candidate-card">
+          <div class="candidate-img-wrap">
+            <img src="${escapeHtml(c.photo)}" alt="${escapeHtml(c.name)}">
+          </div>
+          <div class="candidate-body">
+            <span class="candidate-number">KANDIDAT 0${c.candidate_number}</span>
+            <h3 class="candidate-name">${escapeHtml(c.name)}</h3>
+            <p class="candidate-vision">${escapeHtml(c.vision)}</p>
+            <div class="candidate-actions">
+              <button onclick="openCandidateModal(${c.id})" class="btn btn-secondary btn-sm" style="width: 100%;">
+                📋 Lihat Visi, Misi &amp; Program
+              </button>
+              <a href="/bilik-suara.html" class="btn btn-primary btn-sm" style="width: 100%;">
+                🗳️ Pilih di Bilik Suara
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openCandidateModal(id) {
+      const candidate = currentCandidates.find(c => c.id === id);
+      if (!candidate) return;
+
+      document.getElementById('modalCandNum').textContent = `KANDIDAT 0${candidate.candidate_number}`;
+      document.getElementById('modalCandName').textContent = candidate.name;
+      document.getElementById('modalCandVision').textContent = candidate.vision;
+      document.getElementById('modalCandMission').textContent = candidate.mission;
+      document.getElementById('modalCandPrograms').textContent = candidate.programs;
+
+      document.getElementById('candidateModal').classList.add('active');
+    }
+
+    function closeCandidateModal() {
+      document.getElementById('candidateModal').classList.remove('active');
+    }
+
+    // Tutup modal jika klik overlay
+    document.getElementById('candidateModal').addEventListener('click', (e) => {
+      if (e.target.id === 'candidateModal') closeCandidateModal();
+    });
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

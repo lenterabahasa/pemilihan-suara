@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilik Suara Digital — E-PRESIDEN</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="/img/logo.svg" alt="Logo E-Presiden">
+        <div class="brand-text">
+          <span class="brand-title">E-PRESIDEN</span>
+          <span class="brand-subtitle">Bilik Suara Elektronik</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Beranda</a></li>
+        <li><a href="/bilik-suara.html" class="nav-link active">Bilik Suara</a></li>
+        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+      </ul>
+      <div id="navAuthContainer"></div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    
+    <!-- Area Notifikasi Alert -->
+    <div id="boothAlertContainer"></div>
+
+    <!-- STATE 1: SUDAH MEMILIH (Digital Receipt) -->
+    <div id="votedStateContainer" style="display: none;">
+      <div class="receipt-card">
+        <div class="receipt-icon">✓</div>
+        <span class="badge badge-success" style="margin-bottom: 12px; font-size: 0.85rem;">Hak Pilih Telah Digunakan</span>
+        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Suara Anda Telah Tercatat!</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Terima kasih atas partisipasi Anda dalam simulasi pemilihan presiden ini. Sesuai prinsip <b>Kerahasiaan Suara</b>, data pilihan Anda telah disimpan secara anonim tanpa keterkaitan ke akun pribadi Anda.
+        </p>
+
+        <div style="text-align: left; background: #f8fafc; border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 1.25rem; margin: 1.5rem 0;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Nama Pemilih:</div>
+          <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 12px;" id="receiptVoterName">-</div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Status Pemilihan:</div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--success); margin-bottom: 12px;">Sah &amp; Terverifikasi dalam Transaksi Atomik</div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Kode Tanda Terima Anonim (Receipt Token):</div>
+          <div class="receipt-token-box" id="receiptTokenDisplay">VOTE-RECORDED-ANONYMOUSLY</div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/hasil.html" class="btn btn-primary">
+            📊 Lihat Hasil &amp; Statistik
+          </a>
+          <button onclick="handleLogout()" class="btn btn-secondary">
+            🚪 Keluar / Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE 2: BELUM MEMILIH (Bilik Pemungutan Suara Aktif) -->
+    <div id="votingBoothContainer" style="display: none;">
+      <div style="text-align: center; max-width: 750px; margin: 0 auto 2.5rem;">
+        <span class="badge badge-normal" style="margin-bottom: 8px;">Surat Suara Digital</span>
+        <h2>Tentukan Pilihan Pemimpin Bangsa</h2>
+        <p style="color: var(--text-muted);">
+          Silakan pelajari visi, misi, dan program kerja masing-masing pasangan calon. Anda berhak memberikan <b>satu suara sah</b>. Pilihan Anda dijamin rahasia oleh sistem.
+        </p>
+      </div>
+
+      <!-- Candidate Selection Grid -->
+      <div class="candidate-grid" id="boothCandidateGrid">
+        <div style="text-align: center; grid-column: 1 / -1; padding: 3rem;">
+          <p>Memuat surat suara...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Konfirmasi Pilihan Sesuai PRD -->
+  <div class="modal-overlay" id="confirmVoteModal">
+    <div class="modal-content" style="max-width: 520px; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">🗳️</div>
+      <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem;">Konfirmasi Pilihan Suara</h3>
+      
+      <div style="background: #f8fafc; border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+        <span class="badge badge-warning" id="confirmCandNum">KANDIDAT 01</span>
+        <h4 id="confirmCandName" style="font-size: 1.15rem; margin-top: 8px; color: var(--primary-dark);">-</h4>
+      </div>
+
+      <div class="alert alert-warning" style="text-align: left; font-size: 0.88rem; margin-bottom: 1.5rem;">
+        <div>
+          <b>Peringatan Integritas:</b><br>
+          "Pastikan pilihan Anda sudah benar. Setelah dikonfirmasi, suara tidak dapat diubah."
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <button type="button" onclick="closeConfirmModal()" class="btn btn-secondary">
+          Batal / Cek Lagi
+        </button>
+        <button type="button" id="btnExecuteVote" onclick="executeVote()" class="btn btn-success">
+          Ya, Kirim Suara Sah
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rincian Visi Misi Kandidat -->
+  <div class="modal-overlay" id="candidateDetailModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <div>
+          <span class="badge badge-warning" id="detCandNum">Nomor 01</span>
+          <h3 id="detCandName" style="font-size: 1.3rem; margin-top: 6px;">Nama Kandidat</h3>
+        </div>
+        <button onclick="closeDetailModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Visi:</h4>
+        <p id="detCandVision" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.5;"></p>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Misi:</h4>
+        <p id="detCandMission" style="font-size: 0.92rem; color: var(--text-main); white-space: pre-line; line-height: 1.5;"></p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px;">Program Kerja Unggulan:</h4>
+        <p id="detCandPrograms" style="font-size: 0.92rem; color: var(--text-main); line-height: 1.5;"></p>
+      </div>
+
+      <button onclick="closeDetailModal()" class="btn btn-secondary" style="width: 100%;">Tutup</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container" style="text-align: center; font-size: 0.85rem;">
+      E-PRESIDEN &copy; 2026 — Kerahasiaan Suara Dijamin oleh Kriptografi &amp; Transaksi Atomik Database.
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+    let candidatesList = [];
+    let selectedCandidateId = null;
+
+    async function initBooth() {
+      currentUser = await getCurrentUser();
+      if (!currentUser) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      updateNavAuthUI(currentUser);
+
+      // Cek peran: Admin/Auditor tidak memberikan suara
+      if (currentUser.role !== 'voter') {
+        showAlert('boothAlertContainer', `Peran Anda adalah '${currentUser.role}'. Hanya akun Pemilih yang dapat memberikan suara.`, 'info');
+        return;
+      }
+
+      // Cek status apakah sudah memilih
+      if (currentUser.has_voted === 1) {
+        showAlreadyVotedState();
+        return;
+      }
+
+      // Ambil daftar kandidat
+      try {
+        const candRes = await apiFetch('/api/vote/candidates');
+        candidatesList = candRes.candidates || [];
+        renderBoothCandidates(candidatesList);
+        document.getElementById('votingBoothContainer').style.display = 'block';
+      } catch (err) {
+        showAlert('boothAlertContainer', 'Gagal memuat surat suara: ' + err.message, 'danger');
+      }
+    }
+
+    function showAlreadyVotedState(receiptToken = null) {
+      document.getElementById('votingBoothContainer').style.display = 'none';
+      document.getElementById('votedStateContainer').style.display = 'block';
+      document.getElementById('receiptVoterName').textContent = currentUser.name + ` (${currentUser.voter_id})`;
+
+      if (receiptToken) {
+        document.getElementById('receiptTokenDisplay').textContent = receiptToken;
+      } else {
+        document.getElementById('receiptTokenDisplay').textContent = 'VOTE-RECORDED-ENCRYPTED-CONFIRMED';
+      }
+    }
+
+    function renderBoothCandidates(candidates) {
+      const container = document.getElementById('boothCandidateGrid');
+      if (!candidates || candidates.length === 0) {
+        container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Tidak ada kandidat aktif.</p>';
+        return;
+      }
+
+      container.innerHTML = candidates.map(c => `
+        <div class="candidate-card" id="cardCand${c.id}">
+          <div class="candidate-img-wrap">
+            <img src="${escapeHtml(c.photo)}" alt="${escapeHtml(c.name)}">
+          </div>
+          <div class="candidate-body">
+            <span class="candidate-number">KANDIDAT 0${c.candidate_number}</span>
+            <h3 class="candidate-name">${escapeHtml(c.name)}</h3>
+            <p class="candidate-vision">${escapeHtml(c.vision)}</p>
+
+            <div class="candidate-actions">
+              <button type="button" onclick="showCandidateDetails(${c.id})" class="btn btn-secondary btn-sm" style="width: 100%;">
+                📋 Visi, Misi &amp; Program
+              </button>
+              <button type="button" onclick="promptConfirmVote(${c.id})" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 12px;">
+                🗳️ PILIH KANDIDAT INI
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showCandidateDetails(id) {
+      const candidate = candidatesList.find(c => c.id === id);
+      if (!candidate) return;
+
+      document.getElementById('detCandNum').textContent = `KANDIDAT 0${candidate.candidate_number}`;
+      document.getElementById('detCandName').textContent = candidate.name;
+      document.getElementById('detCandVision').textContent = candidate.vision;
+      document.getElementById('detCandMission').textContent = candidate.mission;
+      document.getElementById('detCandPrograms').textContent = candidate.programs;
+
+      document.getElementById('candidateDetailModal').classList.add('active');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('candidateDetailModal').classList.remove('active');
+    }
+
+    function promptConfirmVote(id) {
+      const candidate = candidatesList.find(c => c.id === id);
+      if (!candidate) return;
+
+      selectedCandidateId = id;
+      document.getElementById('confirmCandNum').textContent = `KANDIDAT 0${candidate.candidate_number}`;
+      document.getElementById('confirmCandName').textContent = candidate.name;
+
+      document.getElementById('confirmVoteModal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmVoteModal').classList.remove('active');
+      selectedCandidateId = null;
+    }
+
+    async function executeVote() {
+      if (!selectedCandidateId) return;
+
+      const btn = document.getElementById('btnExecuteVote');
+      btn.disabled = true;
+      btn.textContent = 'Merekam Suara...';
+
+      try {
+        const res = await apiFetch('/api/vote/cast', {
+          method: 'POST',
+          body: JSON.stringify({ candidateId: selectedCandidateId })
+        });
+
+        closeConfirmModal();
+        currentUser.has_voted = 1;
+        updateNavAuthUI(currentUser);
+
+        showAlreadyVotedState(res.receiptToken);
+        showAlert('boothAlertContainer', 'Suara Anda berhasil disimpan secara aman dan rahasia.', 'success');
+
+      } catch (err) {
+        closeConfirmModal();
+        showAlert('boothAlertContainer', err.message, 'danger');
+        btn.disabled = false;
+        btn.textContent = 'Ya, Kirim Suara Sah';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initBooth);
+  </script>
+</body>
+</html>

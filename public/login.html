@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — E-PRESIDEN</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="/img/logo.svg" alt="Logo E-Presiden">
+        <div class="brand-text">
+          <span class="brand-title">E-PRESIDEN</span>
+          <span class="brand-subtitle">Autentikasi Aman</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Beranda</a></li>
+        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+      </ul>
+      <div id="navAuthContainer">
+        <a href="/" class="btn btn-secondary btn-sm">Kembali</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Main Container -->
+  <main class="container" style="padding-top: 3rem; padding-bottom: 4rem; max-width: 500px;">
+    <div class="card" style="padding: 2.25rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <img src="/img/logo.svg" alt="Logo" style="width: 52px; height: 52px; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.5rem;">Masuk ke Akun Anda</h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">
+          Gunakan ID Pemilih atau kredensial petugas yang telah terdaftar.
+        </p>
+      </div>
+
+      <div id="loginAlertContainer"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="voterId">ID Pemilih / Username</label>
+          <input type="text" id="voterId" class="form-control" placeholder="Contoh: pemilih01 atau admin" required autofocus autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Kata Sandi (Password)</label>
+          <input type="password" id="password" class="form-control" placeholder="Masukkan password Anda" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 12px;">
+          🔐 Masuk Sekarang
+        </button>
+      </form>
+
+      <!-- Quick Demo Account Presets -->
+      <div class="demo-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">AKUN SIMULASI DEMO</span>
+          <span class="badge badge-info" style="font-size: 0.7rem;">1-Klik Isi</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+          Pilih salah satu peran di bawah ini untuk menguji sistem:
+        </p>
+
+        <div class="demo-btn-group">
+          <button type="button" onclick="setDemo('pemilih01', 'voter123')" class="btn btn-secondary btn-sm" style="text-align: left; font-size: 0.78rem;">
+            🗳️ <b>Pemilih (Belum Memilih)</b><br>
+            <span style="color:var(--text-muted);">pemilih01</span>
+          </button>
+          <button type="button" onclick="setDemo('pemilih02', 'voter123')" class="btn btn-secondary btn-sm" style="text-align: left; font-size: 0.78rem;">
+            ✅ <b>Pemilih (Sudah Memilih)</b><br>
+            <span style="color:var(--text-muted);">pemilih02</span>
+          </button>
+          <button type="button" onclick="setDemo('admin', 'admin123')" class="btn btn-secondary btn-sm" style="text-align: left; font-size: 0.78rem;">
+            ⚙️ <b>Administrator</b><br>
+            <span style="color:var(--text-muted);">admin</span>
+          </button>
+          <button type="button" onclick="setDemo('auditor', 'auditor123')" class="btn btn-secondary btn-sm" style="text-align: left; font-size: 0.78rem;">
+            🔍 <b>Auditor Independen</b><br>
+            <span style="color:var(--text-muted);">auditor</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script>
+    function setDemo(voterId, pwd) {
+      document.getElementById('voterId').value = voterId;
+      document.getElementById('password').value = pwd;
+      clearAlert('loginAlertContainer');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAlert('loginAlertContainer');
+
+      const voterId = document.getElementById('voterId').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (!voterId || !password) {
+        showAlert('loginAlertContainer', 'Mohon isi ID Pemilih dan Password.', 'warning');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Memverifikasi...';
+
+      try {
+        const res = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ voter_id: voterId, password })
+        });
+
+        showAlert('loginAlertContainer', 'Login berhasil! Mengalihkan...', 'success');
+
+        setTimeout(() => {
+          if (res.user.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else if (res.user.role === 'auditor') {
+            window.location.href = '/auditor.html';
+          } else {
+            window.location.href = '/bilik-suara.html';
+          }
+        }, 600);
+
+      } catch (err) {
+        showAlert('loginAlertContainer', err.message, 'danger');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🔐 Masuk Sekarang';
+      }
+    });
+
+    // Cek jika pengguna sudah login sebelumnya
+    getCurrentUser().then(user => {
+      if (user) {
+        if (user.role === 'admin') window.location.href = '/admin.html';
+        else if (user.role === 'auditor') window.location.href = '/auditor.html';
+        else window.location.href = '/bilik-suara.html';
+      }
+    });
+  </script>
+</body>
+</html>

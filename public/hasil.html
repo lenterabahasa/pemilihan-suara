@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekapitulasi Hasil Pemilihan — E-PRESIDEN</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="/img/logo.svg" alt="Logo E-Presiden">
+        <div class="brand-text">
+          <span class="brand-title">E-PRESIDEN</span>
+          <span class="brand-subtitle">Transparansi Hasil &amp; Rekapitulasi</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Beranda</a></li>
+        <li><a href="/bilik-suara.html" class="nav-link">Bilik Suara</a></li>
+        <li><a href="/hasil.html" class="nav-link active">Hasil Pemilihan</a></li>
+      </ul>
+      <div id="navAuthContainer"></div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+      <span class="badge badge-normal" id="resStatusBadge" style="margin-bottom: 8px;">Status: Memuat...</span>
+      <h1 id="resElectionTitle" style="font-size: 2.2rem;">Hasil Pemilihan Presiden &amp; Wakil Presiden</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 6px;">
+        Data hasil dihitung langsung dari basis data dengan verifikasi matematis konsistensi suara.
+      </p>
+    </div>
+
+    <!-- Alert Area -->
+    <div id="hasilAlertContainer"></div>
+
+    <!-- Un-published State Notice for Public / Voter -->
+    <div id="unreleasedContainer" style="display: none; max-width: 650px; margin: 0 auto;">
+      <div class="card" style="text-align: center; padding: 3rem 2rem;">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔒</div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.75rem;">Hasil Resmi Belum Dipublikasikan</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+          Demi menjaga ketertiban proses demokrasi, rincian perolehan suara kandidat hanya dapat diakses setelah tahap pemungutan suara resmi ditutup dan dipublikasikan oleh Administrator.
+        </p>
+
+        <div style="background: #f8fafc; border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 1.25rem; margin: 1.5rem 0;">
+          <h4 style="font-size: 0.9rem; color: var(--primary); margin-bottom: 8px;">Statistik Partisipasi Sementara:</h4>
+          <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="font-size: 1.5rem; font-weight: 800;" id="unpubTotalVoters">-</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Pemilih Terdaftar</div>
+            </div>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);" id="unpubTotalVoted">-</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Suara Masuk</div>
+            </div>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold);" id="unpubTurnout">-</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Partisipasi</div>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-light);">
+          Petugas Administrator dan Auditor dapat melihat rincian real-time dengan login menggunakan akun berwenang.
+        </p>
+      </div>
+    </div>
+
+    <!-- Published / Privileged Results Container -->
+    <div id="releasedResultsContainer" style="display: none;">
+      
+      <!-- Metrics Row -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <div class="card">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Total Pemilih (DPT)</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--primary-dark);" id="metricTotalVoters">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Suara Sah Tercatat</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--success);" id="metricTotalVotes">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Tidak Memilih / Golput</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--text-light);" id="metricNonVoters">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Tingkat Partisipasi</div>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-gold);" id="metricTurnout">-</div>
+        </div>
+      </div>
+
+      <!-- Charts & Bars Grid -->
+      <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; align-items: start; margin-bottom: 2rem;">
+        
+        <!-- Bar Representation -->
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size: 1.15rem;">Perolehan Suara Pasangan Calon</h3>
+          </div>
+          <div id="candidateBarsList" style="display: flex; flex-direction: column; gap: 1.5rem; padding: 0.5rem 0;">
+            <!-- Render dinamis bar -->
+          </div>
+        </div>
+
+        <!-- Doughnut Chart Canvas -->
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size: 1.15rem;">Distribusi Persentase</h3>
+          </div>
+          <div style="position: relative; height: 260px; display: flex; justify-content: center;">
+            <canvas id="resultsPieChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Certificate of Data Integrity -->
+      <div class="card" style="border-top: 4px solid var(--success);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1.1rem; color: var(--success-dark);">✓ Integritas Rekapitulasi Terverifikasi</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+              Seluruh suara tersimpan secara atomik tanpa keterkaitan identitas. Suara terhitung persis 100% dari surat suara yang sah.
+            </p>
+          </div>
+          <div id="snapshotBadgeArea">
+            <span class="badge badge-normal">Live Database Tally</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container" style="text-align: center; font-size: 0.85rem;">
+      E-PRESIDEN &copy; 2026 — Transparansi Penuh, Satu Pemilih Satu Suara, Kerahasiaan Terjamin.
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let myChart = null;
+
+    async function initResults() {
+      const user = await getCurrentUser();
+      updateNavAuthUI(user);
+
+      try {
+        const data = await apiFetch('/api/vote/results');
+
+        const title = document.getElementById('resElectionTitle');
+        if (data.electionName) title.textContent = data.electionName;
+
+        const badge = document.getElementById('resStatusBadge');
+        if (data.status === 'published') {
+          badge.textContent = '🔵 HASIL RESMI DIPUBLIKASIKAN';
+          badge.className = 'badge badge-info';
+        } else if (data.status === 'ongoing') {
+          badge.textContent = '🟢 PEMUNGUTAN SUARA SEDANG BERLANGSUNG';
+          badge.className = 'badge badge-success';
+        } else if (data.status === 'closed') {
+          badge.textContent = '🟡 PEMILIHAN DITUTUP (TAHAP REKAPITULASI)';
+          badge.className = 'badge badge-warning';
+        } else {
+          badge.textContent = '⚪ DRAF';
+          badge.className = 'badge badge-neutral';
+        }
+
+        if (!data.published && !data.isPrivileged) {
+          // Tampilkan pesan unreleased
+          document.getElementById('unreleasedContainer').style.display = 'block';
+          document.getElementById('releasedResultsContainer').style.display = 'none';
+
+          if (data.participation) {
+            document.getElementById('unpubTotalVoters').textContent = data.participation.totalVoters;
+            document.getElementById('unpubTotalVoted').textContent = data.participation.totalVoted;
+            document.getElementById('unpubTurnout').textContent = data.participation.turnoutPercentage + '%';
+          }
+          return;
+        }
+
+        // Tampilkan hasil rincian
+        document.getElementById('unreleasedContainer').style.display = 'none';
+        document.getElementById('releasedResultsContainer').style.display = 'block';
+
+        document.getElementById('metricTotalVoters').textContent = data.totalVoters;
+        document.getElementById('metricTotalVotes').textContent = data.totalVotes;
+        document.getElementById('metricNonVoters').textContent = data.totalNonVoters;
+        document.getElementById('metricTurnout').textContent = data.turnoutPercentage + '%';
+
+        renderCandidateBars(data.candidates, data.totalVotes);
+        renderChart(data.candidates);
+
+      } catch (err) {
+        showAlert('hasilAlertContainer', 'Gagal memuat rekapitulasi: ' + err.message, 'danger');
+      }
+    }
+
+    function renderCandidateBars(candidates, totalVotes) {
+      const container = document.getElementById('candidateBarsList');
+      if (!candidates || candidates.length === 0) {
+        container.innerHTML = '<p>Belum ada data perolehan suara.</p>';
+        return;
+      }
+
+      container.innerHTML = candidates.map(c => `
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+            <div style="font-weight: 700; font-size: 1rem; color: var(--primary-dark);">
+              <span class="candidate-number" style="margin-right: 6px;">0${c.candidateNumber}</span>
+              ${escapeHtml(c.name)}
+            </div>
+            <div style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">
+              ${c.percentage}% <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">(${c.voteCount} suara)</span>
+            </div>
+          </div>
+          <div style="width: 100%; height: 16px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
+            <div style="width: ${c.percentage}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 9999px; transition: width 0.8s ease;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderChart(candidates) {
+      const ctx = document.getElementById('resultsPieChart');
+      if (!ctx || typeof Chart === 'undefined') return;
+
+      const labels = candidates.map(c => `0${c.candidateNumber}. ${c.name.split('&')[0].trim()}`);
+      const dataValues = candidates.map(c => c.voteCount);
+      const colors = ['#1e3a8a', '#10b981', '#f59e0b', '#0284c7', '#8b5cf6'];
+
+      if (myChart) myChart.destroy();
+
+      myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: dataValues,
+            backgroundColor: colors.slice(0, candidates.length),
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                font: { size: 11 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initResults);
+  </script>
+</body>
+</html>

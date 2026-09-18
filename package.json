@@ -1,0 +1,26 @@
+{
+  "name": "e-presiden",
+  "version": "1.0.0",
+  "description": "Website Simulasi Pemilihan Presiden dengan Sistem Pencegahan Kecurangan",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/db/seed.js",
+    "test": "node test/test-system.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0"
+  },
+  "keywords": [
+    "e-voting",
+    "election",
+    "anti-fraud",
+    "audit-log"
+  ],
+  "author": "E-PRESIDEN Team",
+  "license": "ISC"
+}

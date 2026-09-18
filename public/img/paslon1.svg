@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" rx="16" fill="url(#bg1)"/>
+  
+  <!-- Badge Nomor 01 -->
+  <circle cx="45" cy="45" r="24" fill="#fbbf24"/>
+  <text x="45" y="53" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="900" fill="#0f172a" text-anchor="middle">01</text>
+  
+  <!-- Pasangan Siluet 1: Capres & Cawapres -->
+  <!-- Sosok Kiri (Capres) -->
+  <circle cx="120" cy="85" r="32" fill="#fed7aa"/>
+  <path d="M96 75 C100 55 140 55 144 75" fill="#1e293b"/>
+  <path d="M75 180 C75 130 165 130 165 180 Z" fill="#0f172a"/>
+  <!-- Jas & Dasi Merah -->
+  <path d="M110 135 L120 165 L130 135 Z" fill="#f8fafc"/>
+  <polygon points="117,140 123,140 121,170 119,170" fill="#dc2626"/>
+
+  <!-- Sosok Kanan (Cawapres) -->
+  <circle cx="205" cy="85" r="30" fill="#fde68a"/>
+  <!-- Hijab / Rambut Rapi -->
+  <path d="M175 90 C175 55 235 55 235 90 C235 125 175 125 175 90 Z" fill="#0284c7" opacity="0.9"/>
+  <circle cx="205" cy="85" r="22" fill="#fde68a"/>
+  <path d="M165 180 C165 135 245 135 245 180 Z" fill="#0369a1"/>
+  
+  <!-- Label Banner -->
+  <rect x="20" y="155" width="280" height="32" rx="8" fill="#0f172a" opacity="0.85"/>
+  <text x="160" y="176" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">DR. ARYA WIJAYA &amp; IR. SITI NURHALIZA</text>
+</svg>

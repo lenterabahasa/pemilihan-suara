@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Administrator — E-PRESIDEN</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="/img/logo.svg" alt="Logo E-Presiden">
+        <div class="brand-text">
+          <span class="brand-title">E-PRESIDEN</span>
+          <span class="brand-subtitle">Pusat Kendali &amp; Pengawasan Pemilu</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Beranda</a></li>
+        <li><a href="/admin.html" class="nav-link active">Admin Dashboard</a></li>
+        <li><a href="/hasil.html" class="nav-link">Hasil Pemilihan</a></li>
+      </ul>
+      <div id="navAuthContainer"></div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+      <div>
+        <h1 style="font-size: 1.85rem;">Dashboard Administrator</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 2px;">
+          Pantau pelaksanaan pemungutan suara, kelola data pemilih, dan tindak lanjuti sinyal anomali.
+        </p>
+      </div>
+      <div>
+        <span class="badge badge-normal" id="headerStatusBadge">Status: Memuat...</span>
+      </div>
+    </div>
+
+    <!-- Alert Area -->
+    <div id="adminAlertContainer"></div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tabMonitoring')">📊 Monitoring &amp; Partisipasi</button>
+      <button class="tab-btn" onclick="switchTab('tabFraud')">🚨 Deteksi Kecurangan (Anti-Fraud)</button>
+      <button class="tab-btn" onclick="switchTab('tabAudit')">📜 Audit Log &amp; Kriptografi</button>
+      <button class="tab-btn" onclick="switchTab('tabVoters')">👥 Kelola Pemilih</button>
+      <button class="tab-btn" onclick="switchTab('tabSettings')">⚙️ Pengaturan &amp; Kandidat</button>
+    </div>
+
+    <!-- TAB 1: MONITORING -->
+    <div id="tabMonitoring" class="tab-pane active">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="card">
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Total Pemilih Terdaftar</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary);" id="monTotalVoters">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Total Suara Sah Masuk</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--success);" id="monTotalVoted">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Belum Menggunakan Hak</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--text-light);" id="monTotalNonVoters">-</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Tingkat Partisipasi</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold);" id="monTurnoutRate">-%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.15rem;">Konsistensi &amp; Integritas Data Suara</h3>
+          <button onclick="createSnapshot()" class="btn btn-primary btn-sm">📸 Buat Snapshot Hasil</button>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Memverifikasi bahwa jumlah pemilih yang ditandai <code>has_voted = 1</code> persis sama dengan jumlah baris surat suara anonim di tabel <code>votes</code>.
+        </p>
+        <div id="monIntegrityBox" style="padding: 1rem; border-radius: var(--radius-md); background: #f8fafc; border: 1px solid var(--surface-border); margin-top: 10px;">
+          Memeriksa integritas...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DETEKSI KECURANGAN (ANTI-FRAUD) -->
+    <div id="tabFraud" class="tab-pane">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div>
+            <h3 style="font-size: 1.2rem;">Pusat Pemantauan Kejadian Fraud (Anti-Fraud Center)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+              Sistem mendeteksi percobaan login berulang, duplicate vote, dan request anomali dengan kategori risiko.
+            </p>
+          </div>
+          <button onclick="loadFraudEvents()" class="btn btn-secondary btn-sm">🔄 Muat Ulang</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+          <div>
+            <label class="form-label" style="font-size: 0.8rem;">Tingkat Risiko (Severity):</label>
+            <select id="fraudSeverityFilter" class="form-control" style="width: auto;" onchange="loadFraudEvents()">
+              <option value="all">Semua Tingkat</option>
+              <option value="suspicious">Mencurigakan (Suspicious)</option>
+              <option value="review">Perlu Ditinjau (Review)</option>
+              <option value="normal">Normal</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.8rem;">Status Pemeriksaan:</label>
+            <select id="fraudStatusFilter" class="form-control" style="width: auto;" onchange="loadFraudEvents()">
+              <option value="all">Semua Status</option>
+              <option value="unreviewed">Belum Ditinjau (Unreviewed)</option>
+              <option value="investigating">Sedang Diinvestigasi</option>
+              <option value="resolved">Terselesaikan (Resolved)</option>
+              <option value="dismissed">Ditolak / False Alarm</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table" id="fraudTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Waktu</th>
+                <th>Jenis Peristiwa</th>
+                <th>Tingkat Risiko</th>
+                <th>Deskripsi Aktivitas</th>
+                <th>Status Review</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="fraudTableBody">
+              <tr><td colspan="7" style="text-align:center;">Memuat data anomali...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUDIT LOG -->
+    <div id="tabAudit" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3 style="font-size: 1.2rem;">Catatan Audit Log (Append-Only)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+              Seluruh tindakan sensitif dicatat secara permanen dengan kriptografi Hash-Chaining.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="verifyAuditIntegrity()" class="btn btn-success btn-sm">
+              🛡️ Verifikasi Integritas Rantai Log
+            </button>
+            <button onclick="loadAuditLogs()" class="btn btn-secondary btn-sm">🔄 Muat Ulang</button>
+          </div>
+        </div>
+
+        <div id="integrityResultBox" style="display: none; margin-bottom: 1.25rem;"></div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Waktu</th>
+                <th>Peristiwa (Event)</th>
+                <th>Pengguna</th>
+                <th>Metadata Teknis</th>
+                <th>Rantai Hash SHA-256</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <tr><td colspan="6" style="text-align:center;">Memuat audit logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: KELOLA PEMILIH -->
+    <div id="tabVoters" class="tab-pane">
+      <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; align-items: start;">
+        <!-- Form Tambah Pemilih -->
+        <div class="card">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Tambah Pemilih Baru</h3>
+          <form id="addVoterForm">
+            <div class="form-group">
+              <label class="form-label">ID Pemilih / NIK Unik</label>
+              <input type="text" id="newVoterId" class="form-control" placeholder="Contoh: pemilih11" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" id="newVoterName" class="form-control" placeholder="Nama pemilih" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kata Sandi Awal</label>
+              <input type="password" id="newVoterPassword" class="form-control" placeholder="Minimal 6 karakter" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">➕ Daftarkan Pemilih</button>
+          </form>
+        </div>
+
+        <!-- Tabel Daftar Pemilih -->
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size: 1.15rem;">Daftar Pemilih Terdaftar</h3>
+            <button onclick="loadVoters()" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>ID Pemilih</th>
+                  <th>Nama</th>
+                  <th>Status Hak Suara</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="votersTableBody">
+                <tr><td colspan="5" style="text-align:center;">Memuat daftar pemilih...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: PENGATURAN & KANDIDAT -->
+    <div id="tabSettings" class="tab-pane">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        
+        <!-- Status Pemilihan -->
+        <div class="card">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Status &amp; Jadwal Pemilihan</h3>
+          <form id="electionSettingsForm">
+            <div class="form-group">
+              <label class="form-label">Nama Pemilihan</label>
+              <input type="text" id="setElectionName" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status Pemilihan</label>
+              <select id="setElectionStatus" class="form-control">
+                <option value="draft">Draf (Draft - Belum dibuka)</option>
+                <option value="ongoing">Sedang Berlangsung (Ongoing)</option>
+                <option value="closed">Ditutup (Closed - Pemungutan suara selesai)</option>
+                <option value="published">Hasil Dipublikasikan (Published - Terbuka Umum)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Simpan Pengaturan</button>
+          </form>
+        </div>
+
+        <!-- Snapshot Info -->
+        <div class="card">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Snapshot Hasil Kriptografis</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Saat pemilihan ditutup, buat snapshot untuk membekukan total suara dan menghasilkan hash kriptografis yang diverifikasi oleh Auditor.
+          </p>
+          <div id="snapshotListContainer" style="margin-top: 1rem;">
+            Memuat daftar snapshot...
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Review Kejadian Fraud -->
+  <div class="modal-overlay" id="reviewFraudModal">
+    <div class="modal-content">
+      <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">Tinjau Aktivitas Anomali</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;" id="modalFraudDesc">-</p>
+
+      <form id="fraudReviewForm">
+        <input type="hidden" id="modalFraudId">
+        <div class="form-group">
+          <label class="form-label">Ubah Status Tindak Lanjut:</label>
+          <select id="modalFraudStatus" class="form-control" required>
+            <option value="unreviewed">Belum Ditinjau (Unreviewed)</option>
+            <option value="investigating">Sedang Diinvestigasi (Investigating)</option>
+            <option value="resolved">Selesai / Teratasi (Resolved)</option>
+            <option value="dismissed">Ditolak / Alarm Palsu (Dismissed)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan Hasil Pemeriksaan:</label>
+          <textarea id="modalFraudNotes" class="form-control" rows="3" placeholder="Tuliskan hasil evaluasi atau tindakan perbaikan..."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" onclick="closeFraudModal()" class="btn btn-secondary">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Hasil Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentAdmin = null;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+
+      const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (btn) btn.classList.add('active');
+
+      if (tabId === 'tabMonitoring') loadMonitoring();
+      else if (tabId === 'tabFraud') loadFraudEvents();
+      else if (tabId === 'tabAudit') loadAuditLogs();
+      else if (tabId === 'tabVoters') loadVoters();
+      else if (tabId === 'tabSettings') loadSettings();
+    }
+
+    async function initAdmin() {
+      currentAdmin = await getCurrentUser();
+      if (!currentAdmin || currentAdmin.role !== 'admin') {
+        window.location.href = '/login.html';
+        return;
+      }
+      updateNavAuthUI(currentAdmin);
+      loadMonitoring();
+    }
+
+    async function loadMonitoring() {
+      try {
+        const results = await apiFetch('/api/vote/results');
+        document.getElementById('monTotalVoters').textContent = results.totalVoters;
+        document.getElementById('monTotalVoted').textContent = results.totalVoted;
+        document.getElementById('monTotalNonVoters').textContent = results.totalNonVoters;
+        document.getElementById('monTurnoutRate').textContent = results.turnoutPercentage + '%';
+
+        const statusBadge = document.getElementById('headerStatusBadge');
+        statusBadge.textContent = 'Status: ' + results.status.toUpperCase();
+        statusBadge.className = results.status === 'ongoing' ? 'badge badge-success' : 'badge badge-warning';
+
+        const integrity = results.dataIntegrity;
+        const box = document.getElementById('monIntegrityBox');
+        if (integrity && integrity.isConsistent) {
+          box.innerHTML = `
+            <div style="color:var(--success-dark); font-weight:600;">
+              ✓ Status Integritas Valid: Jumlah pemilih yang telah mencoblos (${integrity.votersMarked}) TEPAT SAMA dengan surat suara di kotak suara (${integrity.ballotsInBox}).
+            </div>
+          `;
+        } else {
+          box.innerHTML = `
+            <div style="color:var(--danger-dark); font-weight:600;">
+              ⚠️ Peringatan: Terdapat selisih antara penanda pemilih (${integrity?.votersMarked}) dan surat suara (${integrity?.ballotsInBox})!
+            </div>
+          `;
+        }
+      } catch (err) {
+        showAlert('adminAlertContainer', 'Gagal memuat monitoring: ' + err.message, 'danger');
+      }
+    }
+
+    async function loadFraudEvents() {
+      const severity = document.getElementById('fraudSeverityFilter').value;
+      const status = document.getElementById('fraudStatusFilter').value;
+
+      try {
+        const res = await apiFetch(`/api/admin/fraud-events?severity=${severity}&status=${status}`);
+        const tbody = document.getElementById('fraudTableBody');
+
+        if (!res.events || res.events.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada peristiwa fraud ditemukan pada filter ini.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = res.events.map(ev => {
+          let sevBadge = '';
+          if (ev.severity === 'suspicious') sevBadge = '<span class="badge badge-suspicious">Mencurigakan</span>';
+          else if (ev.severity === 'review') sevBadge = '<span class="badge badge-review">Perlu Ditinjau</span>';
+          else sevBadge = '<span class="badge badge-normal">Normal</span>';
+
+          let statBadge = '';
+          if (ev.status === 'unreviewed') statBadge = '<span class="badge badge-danger">Belum Ditinjau</span>';
+          else if (ev.status === 'investigating') statBadge = '<span class="badge badge-warning">Investigasi</span>';
+          else if (ev.status === 'resolved') statBadge = '<span class="badge badge-success">Selesai</span>';
+          else statBadge = '<span class="badge badge-neutral">Ditolak</span>';
+
+          return `
+            <tr>
+              <td>#${ev.id}</td>
+              <td style="font-size:0.8rem; color:var(--text-muted);">${ev.created_at}</td>
+              <td><b>${escapeHtml(ev.event_type)}</b></td>
+              <td>${sevBadge}</td>
+              <td style="font-size:0.85rem; max-width: 320px;">${escapeHtml(ev.description)}</td>
+              <td>${statBadge}</td>
+              <td>
+                <button onclick="openFraudModal(${ev.id}, '${escapeHtml(ev.description)}', '${ev.status}', '${escapeHtml(ev.review_notes || '')}')" class="btn btn-secondary btn-sm">
+                  Tinjau
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        showAlert('adminAlertContainer', 'Gagal memuat fraud events: ' + err.message, 'danger');
+      }
+    }
+
+    function openFraudModal(id, desc, status, notes) {
+      document.getElementById('modalFraudId').value = id;
+      document.getElementById('modalFraudDesc').textContent = desc;
+      document.getElementById('modalFraudStatus').value = status;
+      document.getElementById('modalFraudNotes').value = notes;
+      document.getElementById('reviewFraudModal').classList.add('active');
+    }
+
+    function closeFraudModal() {
+      document.getElementById('reviewFraudModal').classList.remove('active');
+    }
+
+    document.getElementById('fraudReviewForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('modalFraudId').value;
+      const status = document.getElementById('modalFraudStatus').value;
+      const notes = document.getElementById('modalFraudNotes').value;
+
+      try {
+        await apiFetch(`/api/admin/fraud-events/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ status, notes })
+        });
+        closeFraudModal();
+        showAlert('adminAlertContainer', 'Kejadian fraud #' + id + ' berhasil diperbarui.', 'success');
+        loadFraudEvents();
+      } catch (err) {
+        alert('Gagal update: ' + err.message);
+      }
+    });
+
+    async function loadAuditLogs() {
+      try {
+        const res = await apiFetch('/api/audit/logs');
+        const tbody = document.getElementById('auditTableBody');
+
+        if (!res.logs || res.logs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada catatan log.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = res.logs.map(log => `
+          <tr>
+            <td>#${log.id}</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${log.created_at}</td>
+            <td><span class="badge badge-info">${escapeHtml(log.event_type)}</span></td>
+            <td>${log.user_name ? escapeHtml(log.user_name) : '<span style="color:var(--text-light);">Sistem</span>'}</td>
+            <td style="font-size:0.8rem; font-family:var(--font-mono); max-width:280px; overflow:hidden; text-overflow:ellipsis;">
+              ${escapeHtml(log.metadata)}
+            </td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--primary);">
+              ${log.log_hash ? log.log_hash.substring(0, 16) + '...' : '-'}
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showAlert('adminAlertContainer', 'Gagal memuat audit log: ' + err.message, 'danger');
+      }
+    }
+
+    async function verifyAuditIntegrity() {
+      const box = document.getElementById('integrityResultBox');
+      box.style.display = 'block';
+      box.innerHTML = '<p>Memverifikasi rantai hash kriptografis...</p>';
+
+      try {
+        const res = await apiFetch('/api/audit/verify-integrity', { method: 'POST' });
+        const v = res.verification;
+
+        if (v.valid) {
+          box.innerHTML = `
+            <div class="alert alert-success">
+              <div>
+                <b>✓ Verifikasi Integritas Sukses!</b><br>
+                ${v.message} (Total ${v.totalEntries} entri valid).<br>
+                <small style="font-family:var(--font-mono);">Latest SHA-256 Hash: ${v.latestHash}</small>
+              </div>
+            </div>
+          `;
+        } else {
+          box.innerHTML = `
+            <div class="alert alert-danger">
+              <div>
+                <b>⚠️ Peringatan Korupsi/Manipulasi Log!</b><br>
+                ${v.reason} (Terputus pada entri #${v.brokenAtId}).
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        box.innerHTML = `<div class="alert alert-danger">Gagal memverifikasi: ${err.message}</div>`;
+      }
+    }
+
+    async function loadVoters() {
+      try {
+        const res = await apiFetch('/api/admin/voters');
+        const tbody = document.getElementById('votersTableBody');
+
+        tbody.innerHTML = res.voters.map(v => `
+          <tr>
+            <td>${v.id}</td>
+            <td><b>${escapeHtml(v.voter_id)}</b></td>
+            <td>${escapeHtml(v.name)}</td>
+            <td>
+              ${v.has_voted === 1 ? '<span class="badge badge-success">Sudah Memilih</span>' : '<span class="badge badge-neutral">Belum Memilih</span>'}
+            </td>
+            <td>
+              <button onclick="promptResetPassword(${v.id}, '${escapeHtml(v.name)}')" class="btn btn-secondary btn-sm">
+                Reset Password
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showAlert('adminAlertContainer', 'Gagal memuat daftar pemilih: ' + err.message, 'danger');
+      }
+    }
+
+    document.getElementById('addVoterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const voter_id = document.getElementById('newVoterId').value;
+      const name = document.getElementById('newVoterName').value;
+      const password = document.getElementById('newVoterPassword').value;
+
+      try {
+        await apiFetch('/api/admin/voters', {
+          method: 'POST',
+          body: JSON.stringify({ voter_id, name, password })
+        });
+        showAlert('adminAlertContainer', `Pemilih ${name} (${voter_id}) berhasil didaftarkan.`, 'success');
+        document.getElementById('addVoterForm').reset();
+        loadVoters();
+      } catch (err) {
+        showAlert('adminAlertContainer', err.message, 'danger');
+      }
+    });
+
+    async function promptResetPassword(id, name) {
+      const pwd = prompt(`Masukkan password baru untuk ${name} (min 6 karakter):`);
+      if (!pwd) return;
+
+      try {
+        await apiFetch(`/api/admin/voters/${id}/reset-password`, {
+          method: 'POST',
+          body: JSON.stringify({ newPassword: pwd })
+        });
+        alert(`Password untuk ${name} berhasil diubah.`);
+      } catch (err) {
+        alert('Gagal reset password: ' + err.message);
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const res = await apiFetch('/api/vote/status');
+        const el = res.election;
+        document.getElementById('setElectionName').value = el.name;
+        document.getElementById('setElectionStatus').value = el.status;
+
+        // Ambil snapshots
+        const snapRes = await apiFetch('/api/audit/snapshots');
+        const snapContainer = document.getElementById('snapshotListContainer');
+        if (!snapRes.snapshots || snapRes.snapshots.length === 0) {
+          snapContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Belum ada snapshot dibuat.</p>';
+        } else {
+          snapContainer.innerHTML = snapRes.snapshots.map(s => `
+            <div style="padding:10px; border:1px solid var(--surface-border); border-radius:6px; margin-bottom:8px; font-size:0.85rem;">
+              <div><b>Snapshot #${s.id}</b> - ${s.created_at}</div>
+              <div>Total Suara: ${s.total_votes} / ${s.total_voters} (${s.turnout_percentage}%)</div>
+              <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--primary); word-break:break-all;">Hash: ${s.integrity_hash}</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        showAlert('adminAlertContainer', 'Gagal memuat pengaturan: ' + err.message, 'danger');
+      }
+    }
+
+    document.getElementById('electionSettingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('setElectionName').value;
+      const status = document.getElementById('setElectionStatus').value;
+
+      try {
+        await apiFetch('/api/admin/election', {
+          method: 'PUT',
+          body: JSON.stringify({ name, status })
+        });
+        showAlert('adminAlertContainer', 'Pengaturan pemilihan berhasil diperbarui.', 'success');
+        loadMonitoring();
+      } catch (err) {
+        showAlert('adminAlertContainer', err.message, 'danger');
+      }
+    });
+
+    async function createSnapshot() {
+      if (!confirm('Apakah Anda yakin ingin membuat snapshot integritas hasil pemilihan saat ini?')) return;
+      try {
+        const res = await apiFetch('/api/admin/election/snapshot', { method: 'POST' });
+        alert('Snapshot berhasil dibuat dengan SHA-256 Hash:\n' + res.snapshot.integrityHash);
+        loadMonitoring();
+      } catch (err) {
+        alert('Gagal membuat snapshot: ' + err.message);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initAdmin);
+  </script>
+</body>
+</html>
